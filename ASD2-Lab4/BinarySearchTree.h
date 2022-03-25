@@ -17,9 +17,67 @@ private:
 	NodeType m_root;
 	size_t m_size;
 
-	T minimum(NodeType root)
+	BinarySearchTree(NodeType root)
 	{
-		return root->left ? minimum(root->left) : root->value;
+		m_root = balance(root);
+		m_size = size(root);
+	}
+
+	size_t getHeight(NodeType root)
+	{
+		return root ? root->height : 0;
+	}
+
+	void correctHeight(NodeType root)
+	{
+		root->height = std::max(getHeight(root->left), getHeight(root->right)) + 1;
+	}
+
+	int getBalanceFactor(NodeType root)
+	{
+		return getHeight(root->right) - getHeight(root->left);
+	}
+
+	NodeType rotateLeft(NodeType root)
+	{
+		NodeType right = root->right;
+		root->right = right->left;
+		right->left = root;
+		correctHeight(root);
+		correctHeight(right);
+		return right;
+	}
+
+	NodeType rotateRight(NodeType root)
+	{
+		NodeType left = root->left;
+		root->left = left->right;
+		left->right = root;
+		correctHeight(root);
+		correctHeight(left);
+		return left;
+	}
+
+	NodeType balance(NodeType root)
+	{
+		correctHeight(root);
+		if (getBalanceFactor(root) == 2)
+		{
+			if (getBalanceFactor(root->right) < 0)
+			{
+				root->right = rotateRight(root->right);
+			}
+			return rotateLeft(root);
+		}
+		if (getBalanceFactor(root) == -2)
+		{
+			if (getBalanceFactor(root->left) > 0)
+			{
+				root->left = rotateLeft(root->left);
+			}
+			return rotateRight(root);
+		}
+		return root;
 	}
 
 	NodeType insert(NodeType root, T object)
@@ -37,7 +95,7 @@ private:
 		{
 			root->right = insert(root->right, object);
 		}
-		return root;
+		return balance(root);
 	}
 
 	NodeType find(NodeType root, T object)
@@ -53,48 +111,51 @@ private:
 		return find(root->right, object);
 	}
 
-	NodeType erase(NodeType root, T object, bool changeSize)
+	NodeType getMin(NodeType root)
+	{
+		return root->left ? getMin(root->left) : root;
+	}
+
+	NodeType eraseMin(NodeType root)
+	{
+		if (!root->left)
+		{
+			return root->right;
+		}
+		root->left = eraseMin(root->left);
+		return balance(root);
+	}
+
+	NodeType erase(NodeType root, T object)
 	{
 		if (!root)
 		{
-			return root;
+			return nullptr;
 		}
 		if (object < root->value)
 		{
-			root->left = erase(root->left, object, changeSize);
+			root->left = erase(root->left, object);
 		}
 		else if (object > root->value)
 		{
-			root->right = erase(root->right, object, changeSize);
+			root->right = erase(root->right, object);
 		}
 		else
 		{
-			if (changeSize)
+			--m_size;
+			NodeType left = root->left;
+			NodeType right = root->right;
+			delete root;
+			if (!right)
 			{
-				--m_size;
+				return left;
 			}
-			if (root->left && root->right)
-			{
-				root->value = minimum(root->right);
-				root->right = erase(root->right, root->value, false);
-			}
-			else
-			{
-				if (root->left)
-				{
-					root = root->left;
-				}
-				else if (root->right)
-				{
-					root = root->right;
-				}
-				else
-				{
-					root = nullptr;
-				}
-			}
+			NodeType min = getMin(right);
+			min->right = eraseMin(right);
+			min->left = left;
+			return balance(min);
 		}
-		return root;
+		return balance(root);
 	}
 
 	size_t size(NodeType root)
@@ -111,11 +172,6 @@ private:
 			std::cout << std::endl;
 			print(root->right);
 		}
-	}
-
-	size_t height(NodeType root)
-	{
-		return root ? std::max(height(root->left), height(root->right)) + 1 : 0;
 	}
 
 	size_t findInRange(NodeType root, T minObject, T maxObject)
@@ -191,12 +247,6 @@ public:
 		m_size = 0;
 	}
 
-	BinarySearchTree(NodeType root)
-	{
-		m_root = root;
-		m_size = size(root);
-	}
-
 	~BinarySearchTree()
 	{
 		if (m_root)
@@ -217,7 +267,7 @@ public:
 
 	void erase(T object)
 	{
-		m_root = erase(m_root, object, true);
+		m_root = erase(m_root, object);
 	}
 
 	size_t size()
@@ -232,7 +282,7 @@ public:
 
 	int height()
 	{
-		return height(m_root);
+		return getHeight(m_root);
 	}
 
 	size_t findInRange(T minObject, T maxObject)

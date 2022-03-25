@@ -113,18 +113,50 @@ bool testBinarySearchTree()
 	cout << "Time: " << stlTime << ", size: " << stlInsertSize << " - " << stlEraseSize <<
 		", found amount: " << stlFoundAmount << endl;
 	cout << "Range time: " << stlRangeTime << ", range found amount: " <<
-		stlRangeFoundAmount << endl << endl;
+		stlRangeFoundAmount << endl;
 	if (myInsertSize == stlInsertSize && myEraseSize == stlEraseSize &&
 		myFoundAmount == stlFoundAmount && myRangeFoundAmount == stlRangeFoundAmount)
 	{
-		cout << "The lab is completed" << endl;
+		cout << "BinarySearchTree test passed" << endl;
 		return true;
 	}
-	cerr << ":(" << endl;
+	cerr << "BinarySearchTree test not passed" << endl;
+	return false;
+}
+
+bool testEraseRange()
+{
+	srand(time(NULL));
+	BinarySearchTree<Data> bst;
+	for (int i = 0; i < 10000; i++)
+	{
+		bst.insert(Data());
+	}
+	Data minObject = Data();
+	Data maxObject = Data();
+	if (maxObject < minObject)
+	{
+		swap(minObject, maxObject);
+	}
+	size_t foundBefore = bst.findInRange(minObject, maxObject);
+	cout << "range before erase: " << foundBefore << endl;
+	bst.eraseRange(minObject, maxObject);
+	size_t foundAfter = bst.findInRange(minObject, maxObject);
+	cout << "range after erase: " << foundAfter << endl;
+	if (foundAfter == 0)
+	{
+		cout << "eraseRange test passed" << endl;
+		return true;
+	}
+	cout << "eraseRange test not passed" << endl;
 	return false;
 }
 
 int main()
 {
+	cout << "BinarySearchTree test: " << endl;
 	testBinarySearchTree();
+	cout << endl;
+	cout << "eraseRange test:" << endl;
+	testEraseRange();
 }
