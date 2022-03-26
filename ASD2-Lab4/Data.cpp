@@ -13,9 +13,9 @@ Data::Data()
 
 void Data::print()
 {
-	std::cout << "{ " 
-		<< nick << ", " 
-		<< rank << ", " 
-		<< experience << ", " 
+	std::cout << "{ "
+		<< nick << ", "
+		<< rank << ", "
+		<< experience << ", "
 		<< donate << " }";
 }

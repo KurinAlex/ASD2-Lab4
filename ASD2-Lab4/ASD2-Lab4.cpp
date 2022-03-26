@@ -4,12 +4,16 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <fstream>
 
 #include "BinarySearchTree.h"
 #include "Data.h"
 #include "Helpers.h"
+#include "Trie.h"
 
 using namespace std;
+
+const string fileName = "words.txt";
 
 bool testBinarySearchTree()
 {
@@ -113,14 +117,14 @@ bool testBinarySearchTree()
 	cout << "Time: " << stlTime << ", size: " << stlInsertSize << " - " << stlEraseSize <<
 		", found amount: " << stlFoundAmount << endl;
 	cout << "Range time: " << stlRangeTime << ", range found amount: " <<
-		stlRangeFoundAmount << endl;
+		stlRangeFoundAmount << endl << endl;
 	if (myInsertSize == stlInsertSize && myEraseSize == stlEraseSize &&
 		myFoundAmount == stlFoundAmount && myRangeFoundAmount == stlRangeFoundAmount)
 	{
-		cout << "BinarySearchTree test passed" << endl;
+		cout << "BinarySearchTree test passed" << endl << endl;
 		return true;
 	}
-	cerr << "BinarySearchTree test not passed" << endl;
+	cerr << "BinarySearchTree test not passed" << endl << endl;
 	return false;
 }
 
@@ -139,24 +143,79 @@ bool testEraseRange()
 		swap(minObject, maxObject);
 	}
 	size_t foundBefore = bst.findInRange(minObject, maxObject);
-	cout << "range before erase: " << foundBefore << endl;
 	bst.eraseRange(minObject, maxObject);
 	size_t foundAfter = bst.findInRange(minObject, maxObject);
-	cout << "range after erase: " << foundAfter << endl;
+	cout << "Range before erase: " << foundBefore << endl;
+	cout << "Range after erase: " << foundAfter << endl;
 	if (foundAfter == 0)
 	{
-		cout << "eraseRange test passed" << endl;
+		cout << "eraseRange test passed" << endl << endl;
 		return true;
 	}
-	cout << "eraseRange test not passed" << endl;
+	cout << "eraseRange test not passed" << endl << endl;
 	return false;
+}
+
+void testTrie()
+{
+	Trie trie;
+	string word;
+	ifstream file;
+
+	file.open(fileName);
+	cout << "Building a trie..." << endl;
+	clock_t start = clock();
+	while (getline(file, word))
+	{
+		trie.insert(word);
+	}
+	clock_t end = clock();
+	cout << "Trie built in " << (float(end - start)) / CLOCKS_PER_SEC << endl;
+	file.close();
+
+	char answer;
+	do
+	{
+		cout << endl << "Enter prefix to test: ";
+		cin >> word;
+
+		vector<string> words = trie.findByPrefix(word);
+		if (words.empty())
+		{
+			cout << "No words found";
+		}
+		else
+		{
+			cout << "Output: ";
+			auto it = words.begin();
+			cout << *(it++);
+			for (; it != words.end(); ++it)
+			{
+				cout << ", " << *it;
+			}
+		}
+		cout << endl;
+
+		do
+		{
+			cout << "Enter y/n if you'd like to continue/stop testing: ";
+			cin >> answer;
+			answer = tolower(answer);
+		} while (answer != 'y' && answer != 'n');
+	} while (answer == 'y');
 }
 
 int main()
 {
-	cout << "BinarySearchTree test: " << endl;
+	cout << "BinarySearchTree test: " << endl << endl;
 	testBinarySearchTree();
 	cout << endl;
-	cout << "eraseRange test:" << endl;
+
+	cout << "eraseRange test:" << endl << endl;
 	testEraseRange();
+	cout << endl;
+
+	cout << "Trie test:" << endl << endl;
+	testTrie();
+	cin.get();
 }

@@ -142,12 +142,16 @@
     <ClCompile Include="ASD2-Lab4.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Helpers.cpp" />
+    <ClCompile Include="Trie.cpp" />
+    <ClCompile Include="TrieNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinarySearchTree.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Trie.h" />
+    <ClInclude Include="TrieNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
