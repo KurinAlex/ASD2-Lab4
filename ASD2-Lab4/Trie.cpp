@@ -15,9 +15,26 @@ vector_string Trie::getAllWords(TrieNode* root, std::string word)
 	return res;
 }
 
+void Trie::clear(TrieNode* root)
+{
+	for (auto pair : root->children)
+	{
+		clear(pair.second);
+	}
+	delete root;
+}
+
 Trie::Trie()
 {
 	m_root = new TrieNode();
+}
+
+Trie::~Trie()
+{
+	if (m_root)
+	{
+		clear(m_root);
+	}
 }
 
 void Trie::insert(std::string word)
